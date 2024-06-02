@@ -569,51 +569,50 @@
                     Console.WriteLine("Estado alumno");
                 }
             } while (opcion != "0");
+        }
 
 
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
+        // ---------------------------------------------------------- MAIN ------------------------------------------------------
 
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-            // ---------------------------------------------------------- MAIN ------------------------------------------------------
-
-            // MAINNNNN
-            static void Main(string[] args)
+        // MAINNNNN
+        static void Main(string[] args)
+        {
+            string? opcion;
+            do
             {
-                string? opcion;
-                do
+                Console.WriteLine();
+                Console.WriteLine("*************************************");
+                Console.WriteLine("*                                   *");
+                Console.WriteLine("*             OPCIONES              *");
+                Console.WriteLine("*-----------------------------------*");
+                Console.WriteLine("*        Ingrese una opcion         *");
+                Console.WriteLine("*          1 - Alumnos              *");
+                Console.WriteLine("*          2 - Materias             *");
+                Console.WriteLine("*          3 - Inscripcion          *");
+                Console.WriteLine("*                                   *");
+                Console.WriteLine("*          0 - Salir                *");
+                Console.WriteLine("*************************************");
+                opcion = Console.ReadLine();
+                Console.Clear();
+                if (opcion == "1")
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("*************************************");
-                    Console.WriteLine("*                                   *");
-                    Console.WriteLine("*             OPCIONES              *");
-                    Console.WriteLine("*-----------------------------------*");
-                    Console.WriteLine("*        Ingrese una opcion         *");
-                    Console.WriteLine("*          1 - Alumnos              *");
-                    Console.WriteLine("*          2 - Materias             *");
-                    Console.WriteLine("*          3 - Inscripcion          *");
-                    Console.WriteLine("*                                   *");
-                    Console.WriteLine("*          0 - Salir                *");
-                    Console.WriteLine("*************************************");
-                    opcion = Console.ReadLine();
-                    Console.Clear();
-                    if (opcion == "1")
-                    {
-                        MenuAlumnos();
-                    }
-                    else if (opcion == "2")
-                    {
-                        MenuMaterias();
-                    }
-                    else if (opcion == "3")
-                    {
-                        MenuInscripciones();
-                    }
-                } while (opcion != "0");
+                    MenuAlumnos();
+                }
+                else if (opcion == "2")
+                {
+                    MenuMaterias();
+                }
+                else if (opcion == "3")
+                {
+                    MenuInscripciones();
+                }
+            } while (opcion != "0");
 
-            }
         }
     }
 }
