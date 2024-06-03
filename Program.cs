@@ -542,6 +542,144 @@
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
 
+        static void InscribirAlumno()
+        {
+            int dniIngresado;
+            do
+            {
+                Console.WriteLine("Ingrese el dni del alumno");
+            } while (!int.TryParse(Console.ReadLine(), out dniIngresado));
+            List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
+            List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
+            List<Inscripcion> nuevaInscripcion = new List<Inscripcion>();
+            Alumno alumno = new Alumno();
+            Materia materia = new Materia();
+            bool existeAlumno = false;
+            bool existeMateria = false;
+            int indiceInscripcion = 0;
+
+            if (listaAlumnos.Exists(alumno => alumno.dni == dniIngresado))
+            {
+                for (int i = 0; i < listaAlumnos.Count; i++)
+                {
+                    if (listaAlumnos[i].dni == dniIngresado)
+                    {
+                        existeAlumno = true;
+                        alumno = listaAlumnos[i];
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No existe un alumno con el dni {dniIngresado}");
+            }
+
+            if (existeAlumno)
+            {
+                int indiceMateria;
+                do
+                {
+                    Console.WriteLine("Ingrese indice de la materia a inscribirse"); // o ya inscripto?
+                } while (!int.TryParse(Console.ReadLine(), out indiceMateria));
+
+                if (listaMaterias.Exists(materia => materia.indice == indiceMateria))
+                {
+                    for (int i = 0; i < listaMaterias.Count; i++)
+                    {
+                        if (listaMaterias[i].indice == indiceMateria)
+                        {
+                            existeMateria = true;
+                            materia = listaMaterias[i];
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No existe una materia con el indice {indiceMateria}");
+                }
+            }
+
+            if (existeMateria)
+            {
+                Inscripcion inscripcion = new Inscripcion();
+                inscripcion.indice = ++indiceInscripcion;
+                inscripcion.indice_alumno = alumno.indice;
+                inscripcion.indice_materia = materia.indice;
+                inscripcion.estado = "Anotado";
+                nuevaInscripcion.Add(inscripcion);
+                Console.WriteLine($"{inscripcion.indice},{inscripcion.indice_alumno}, {inscripcion.indice_materia}, {inscripcion.estado}, {inscripcion.nota}, {inscripcion.fecha}");
+                Console.WriteLine("Alumno inscripto correctamente");
+                EscribirInscripcionEnArchivo(nuevaInscripcion, true);
+            }
+
+        }
+
+        static void EscribirInscripcionEnArchivo(List<Inscripcion> listaInscripcion, bool concat)
+        {
+            using (StreamWriter sw = new StreamWriter(inscripcionPath, concat))
+            {
+                foreach (Inscripcion inscripcion in listaInscripcion)
+                {
+                    sw.WriteLine($"{inscripcion.indice},{inscripcion.indice_alumno},{inscripcion.indice_materia},{inscripcion.estado},{inscripcion.nota},{inscripcion.fecha}");
+                }
+            }
+        }
+
+        static List<Inscripcion> TraerInscripcionDeArchivo(string archivo)
+        {
+            List<Inscripcion> listaInscripcion = new List<Inscripcion>();
+
+            if (!File.Exists(archivo))
+            {
+                using (StreamWriter sw = File.CreateText(archivo)) ;
+            }
+
+            using (StreamReader sr = new StreamReader(archivo))
+            {
+                string? linea = sr.ReadLine();
+                while (linea != null)
+                {
+                    string[] inscripcionCSV = linea.Split(',');
+                    Inscripcion inscripcionStruct = new Inscripcion();
+                    inscripcionStruct.indice = int.Parse(inscripcionCSV[0]);
+                    inscripcionStruct.indice_alumno = int.Parse(inscripcionCSV[1]);
+                    inscripcionStruct.indice_materia = int.Parse(inscripcionCSV[2]);
+                    inscripcionStruct.estado = inscripcionCSV[3];
+                    inscripcionStruct.nota = int.Parse(inscripcionCSV[4]);
+                    inscripcionStruct.fecha = inscripcionCSV[5];
+                    listaInscripcion.Add(inscripcionStruct);
+                    linea = sr.ReadLine();
+                }
+            }
+            return listaInscripcion;
+        }
+
+        static void EstadoInscripcionAlumno()
+        {
+            List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
+            int indiceAlumno;
+            do
+            {
+                Console.WriteLine("Ingrese indice del alumno para ver su estado");
+            } while (!int.TryParse(Console.ReadLine(), out indiceAlumno));
+
+            if(listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
+            {
+                for(int i = 0; i < listaInscripcion.Count; i++)
+                {
+                    if (listaInscripcion[i].indice_alumno == indiceAlumno)
+                    {
+                        Inscripcion inscripcion = listaInscripcion[i];
+                        Console.WriteLine("Ingrese ");
+                    }
+                }
+            }else
+            {
+                Console.WriteLine("No se encontro ningun alumno con ese indice");
+            }
+            
+        }
+
         static void MenuInscripciones()
         {
             string? opcion;
@@ -550,23 +688,39 @@
                 Console.WriteLine();
                 Console.WriteLine("*************************************");
                 Console.WriteLine("*                                   *");
-                Console.WriteLine("*             Menu Inscripciones    *");
+                Console.WriteLine("*         Menu Inscripciones        *");
                 Console.WriteLine("*-----------------------------------*");
                 Console.WriteLine("*        Ingrese una opcion         *");
                 Console.WriteLine("*          1 - Inscribir alumno     *");
                 Console.WriteLine("*          2 - Estado alunno        *");
+                Console.WriteLine("*          3 - Modificar estado     *");
+                Console.WriteLine("*          4 - Mostar todo          *");
                 Console.WriteLine("*                                   *");
                 Console.WriteLine("*          0 - Salir                *");
                 Console.WriteLine("*************************************");
                 opcion = Console.ReadLine();
                 Console.Clear();
+                List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
                 if (opcion == "1")
                 {
-                    Console.WriteLine("Inscribir alumno");
+                    InscribirAlumno();
                 }
-                if (opcion == "2")
+                else if (opcion == "2")
                 {
-                    Console.WriteLine("Estado alumno");
+                    EstadoInscripcionAlumno();
+                }
+                else if (opcion == "3")
+                {
+                    Console.WriteLine("Modificar estado");
+                }
+                else if (opcion == "4")
+                {
+                    string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(10) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
+                    Console.WriteLine(linea);
+                    foreach (Inscripcion inscripcion in listaInscripcion)
+                    {
+                        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{inscripcion.indice_materia.ToString().PadRight(10)}{inscripcion.estado.PadRight(15)}{inscripcion.nota.ToString().PadRight(10)}{inscripcion.fecha}");
+                    }
                 }
             } while (opcion != "0");
         }
@@ -616,3 +770,9 @@
         }
     }
 }
+
+// Que tiene que hacer la seccion inscripcion?
+// tiene que hacer un crud o solo ingresar y leer
+// tengo que ingresar la fecha 1x1? o formato dd/mm/yyyy
+// nota al estar anotado me aparece en 0
+// si modifica, al modificarlo como se a cual materia apunta?
