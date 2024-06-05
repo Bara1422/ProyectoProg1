@@ -36,6 +36,136 @@ namespace ProyectoProg1
         public static string materiasPath = "materias.txt";
         public static string inscripcionPath = "inscripcion.txt";
 
+        // ------------------------------------------------------------ UTILIDADES -----------------------------------------------------
+        // ------------------------------------------------------------ UTILIDADES -----------------------------------------------------
+        // ------------------------------------------------------------ UTILIDADES -----------------------------------------------------
+        // ------------------------------------------------------------ UTILIDADES -----------------------------------------------------
+
+        // VALIDAR CHAR
+        static char validarCharSON(string mensaje)
+        {
+            char opcionChar;
+            do
+            {
+                Console.WriteLine(mensaje);
+            } while (!char.TryParse(Console.ReadLine(), out opcionChar) || (opcionChar != 's' && opcionChar != 'n'));
+
+            return opcionChar;
+        }
+
+        // VALIDAR NUMERO
+
+        static int validarNumero(string mensaje)
+        {
+            int numero;
+            do
+            {
+                Console.WriteLine(mensaje);
+            } while (!int.TryParse(Console.ReadLine(), out numero));
+            return numero;
+        }
+
+        // PEDIR DIA
+
+        static int pedirDia(string mensaje)
+        {
+            int dia;
+            string diaIngresado;
+            do
+            {
+                Console.WriteLine($"Por favor ingrese el dia {mensaje} (01-31), asegurese de que el dia tenga 2 dígitos");
+                diaIngresado = Console.ReadLine();
+            } while (!(diaIngresado.Length == 2 && int.TryParse(diaIngresado, out dia) && dia >= 1 && dia <= 31));
+            return dia;
+        }
+
+        // PEDIR MES
+        static int pedirMes(string mensaje)
+        {
+            int mes;
+            string mesIngresado;
+            do
+            {
+                Console.WriteLine($"Por favor ingrese el mes {mensaje} (01-12), asegurece de que el mes tenga 2 dígitos");
+                mesIngresado = Console.ReadLine();
+            } while (!(mesIngresado.Length == 2 && int.TryParse(mesIngresado, out mes) && mes >= 1 && mes <= 12));
+            return mes;
+        }
+
+        // PEDIR ANIO
+        static int pedirAnio(string mensaje)
+        {
+            int anio;
+            do
+            {
+                Console.WriteLine($"Por favor ingrese el año {mensaje} completo");
+            } while (!(int.TryParse(Console.ReadLine(), out anio) && anio >= 1900 && anio <= 2100));
+            return anio;
+        }
+
+        static bool esBiciesto(int anio)
+        {
+            return (anio % 4 == 0 && (anio % 100 != 0 || anio % 400 == 0));
+        }
+
+        static string fechaValida(string mensaje)
+        {
+            int dia, mes, anio;
+            dia = pedirDia(mensaje);
+            mes = pedirMes(mensaje);
+            anio = pedirAnio(mensaje);
+            string fechaValida = "";
+            bool esFechaValida = true;
+
+            if (mes == 4 || mes == 6 || mes == 9 || mes == 11)
+            {
+                if (dia > 31)
+                {
+                    esFechaValida = false;
+                }
+            }
+            else if (mes == 2)
+            {
+                if (esBiciesto(anio))
+                {
+                    if (dia > 29)
+                    {
+                        esFechaValida = false;
+                    }
+                }
+                else
+                {
+                    if (dia > 28)
+                    {
+                        esFechaValida = false;
+                    }
+                }
+            }
+            if (!esFechaValida)
+            {
+                Console.WriteLine("La fecha ingresada no es válida");
+            }
+            else
+            {
+                fechaValida = $"{dia}/{mes}/{anio}";
+            }
+            return fechaValida;
+        }
+
+        // PEDIR STRING NO NULL
+
+        static string stringValido(string mensaje)
+        {
+            string cadena;
+            do
+            {
+                Console.WriteLine(mensaje);
+                cadena = Console.ReadLine();
+            } while (cadena.Length < 1);
+
+            return cadena;
+        }
+
         // ------------------------------------------------------------ ALUMNOSSS ------------------------------------------------------
         // ------------------------------------------------------------ ALUMNOSSS ------------------------------------------------------
         // ------------------------------------------------------------ ALUMNOSSS ------------------------------------------------------
@@ -61,11 +191,7 @@ namespace ProyectoProg1
             }
 
             Alumno alumno = new Alumno();
-            int dni;
-            do
-            {
-                Console.WriteLine("Ingrese DNI");
-            } while (!int.TryParse(Console.ReadLine(), out dni));
+            int dni = validarNumero("Ingrese DNI");
 
             if (listita.Exists(alumno => alumno.dni == dni))
             {
@@ -76,11 +202,7 @@ namespace ProyectoProg1
                         if (listita[i].estaActivo == false)
                         {
                             Console.WriteLine("El alumno con el dni ingresado se encuentra en la base de datos pero está desactivado");
-                            char opcionElegida;
-                            do
-                            {
-                                Console.WriteLine("Desea activarlo? s/n");
-                            } while (!char.TryParse(Console.ReadLine(), out opcionElegida) || (opcionElegida != 's' && opcionElegida != 'n'));
+                            char opcionElegida = validarCharSON("Desea activarlo? s/n");
                             if (opcionElegida == 's')
                             {
                                 Alumno al = listita[i];
@@ -100,15 +222,19 @@ namespace ProyectoProg1
             else
             {
                 alumno.indice = ++indiceDeAlumno;
-                Console.WriteLine("Ingrese nombre del alumno");
-                alumno.nombre = Console.ReadLine();
+                alumno.nombre = stringValido("Ingrese nombre del alumno");
                 Console.WriteLine("Ingrese apellido del alumno");
-                alumno.apellido = Console.ReadLine();
+                alumno.apellido = stringValido("Ingrese apellido del alumno");
                 alumno.dni = dni;
-                Console.WriteLine("Ingrese fecha de nacimiento en el formato dd/mm/yy");
-                alumno.fechaNacimiento = Console.ReadLine();
-                Console.WriteLine("Ingrese domicilio");
-                alumno.domicilio = Console.ReadLine();
+                string fechaIngresada = "";
+                do
+                {
+                    fechaIngresada = fechaValida("de nacimiento");
+
+                } while (fechaIngresada == "");
+               
+                alumno.fechaNacimiento = fechaIngresada;
+                alumno.domicilio = stringValido("Ingrese domicilio");
                 alumno.estaActivo = true;
                 nuevoAlumno = alumno;
                 listaVacia.Add(nuevoAlumno);
@@ -165,11 +291,7 @@ namespace ProyectoProg1
         public static void BajaAlumno()
         {
             List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
-            int dniAlumno;
-            do
-            {
-                Console.WriteLine("Ingrese el dni del alumno a dar de baja");
-            } while (!int.TryParse(Console.ReadLine(), out dniAlumno));
+            int dniAlumno = validarNumero("Ingrese el dni del alumno a dar de baja");
 
             if (listaAlumnos.Any(elemento => elemento.dni == dniAlumno))
             {
@@ -194,11 +316,7 @@ namespace ProyectoProg1
         // MODIFICAR ALUMNOOOO
         static void ModificarAlumno(List<Alumno> listaAlumnos)
         {
-            int dniIngresado;
-            do
-            {
-                Console.WriteLine("Ingrese el dni del alumno que quiere modificar");
-            } while (!int.TryParse(Console.ReadLine(), out dniIngresado));
+            int dniIngresado = validarNumero("Ingrese el dni del alumno que quiere modifiar");
             if (listaAlumnos.Exists(alumno => alumno.dni == dniIngresado))
             {
                 for (int i = 0; i < listaAlumnos.Count; i++)
@@ -206,26 +324,17 @@ namespace ProyectoProg1
                     if (listaAlumnos[i].dni == dniIngresado)
                     {
                         Alumno alumnoModificado = listaAlumnos[i];
-                        Console.WriteLine("Ingrese nombre del alumno");
-                        alumnoModificado.nombre = Console.ReadLine();
-                        Console.WriteLine("Ingrese apellido del alumno");
-                        alumnoModificado.apellido = Console.ReadLine();
-                        int dni;
-                        do
-                        {
-                            Console.WriteLine("Ingrese DNI");
-                        } while (!int.TryParse(Console.ReadLine(), out dni));
+                        alumnoModificado.nombre = stringValido("Ingrese nombre del alumno");
+                        alumnoModificado.apellido = stringValido("Ingrese apellido del alumno");
+                        int dni = validarNumero("Ingrese DNI");
                         // TODO ingresa dni de otro alumno
                         // for(int j = 0;i < listaAlumnos.Count; i++)
                         // {
                         //     if (listaAlumnos[j].dni)
                         // }
                         alumnoModificado.dni = dni;
-                        Console.WriteLine("Ingrese fecha de nacimiento en el formato dd/mm/yy");
-                        alumnoModificado.fechaNacimiento = Console.ReadLine();
-                        Console.WriteLine("Ingrese domicilio");
-                        alumnoModificado.domicilio = Console.ReadLine();
-
+                        alumnoModificado.fechaNacimiento = fechaValida("de nacimiento");
+                        alumnoModificado.domicilio = stringValido("Ingrese domicilio");
                         listaAlumnos[i] = alumnoModificado;
                         Console.WriteLine("Alumno modificado correctamente");
                         Console.WriteLine();
@@ -258,7 +367,7 @@ namespace ProyectoProg1
                 Console.WriteLine("*          4 - Alumnos activos      *");
                 Console.WriteLine("*          5 - Alumnos inactivos    *");
                 Console.WriteLine("*                                   *");
-                Console.WriteLine("*          0 - Salir                *");
+                Console.WriteLine("*          0 - Volver               *");
                 Console.WriteLine("*************************************");
                 opcion = Console.ReadLine();
                 Console.Clear();
@@ -333,8 +442,8 @@ namespace ProyectoProg1
             {
                 indiceMateria = 0;
             }
-            Console.WriteLine("Ingrese nombre de la materia");
-            string? nombreMateria = Console.ReadLine();
+            
+            string nombreMateria = stringValido("Ingrese nombre de la materia");
             if (listaMaterias.Exists(materia => materia.nombreMateria.ToLower() == nombreMateria.ToLower()))
             {
                 for (int i = 0; i < listaMaterias.Count; i++)
@@ -344,11 +453,7 @@ namespace ProyectoProg1
                         if (listaMaterias[i].estaActiva == false)
                         {
                             Console.WriteLine("La materia se encuentra en la base de datos pero está desactivada");
-                            char opcionActivar;
-                            do
-                            {
-                                Console.WriteLine("Desea activarla? s/n");
-                            } while (!char.TryParse(Console.ReadLine(), out opcionActivar) || (opcionActivar != 's' && opcionActivar != 'n'));
+                            char opcionActivar = validarCharSON("Desea activarla? s/n");
                             if (opcionActivar == 's')
                             {
                                 Materia materiaAModificar = new Materia();
@@ -423,11 +528,7 @@ namespace ProyectoProg1
         public static void BajaMateria()
         {
             List<Materia> materias = TraerMateriasDeArchivo(materiasPath);
-            int indiceMateria;
-            do
-            {
-                Console.WriteLine("Ingrese el indice de la materia que quiere dar de baja");
-            } while (!int.TryParse(Console.ReadLine(), out indiceMateria));
+            int indiceMateria = validarNumero("Ingrese el indice de la materia que quiere dar de baja");
             if (materias.Exists(materia => materia.indice == indiceMateria))
             {
                 for (int i = 0; i < materias.Count; i++)
@@ -451,11 +552,7 @@ namespace ProyectoProg1
         // MODIFICAR MATERIAAAAA
         public static void ModificarMateria(List<Materia> listaMaterias)
         {
-            int opcionAModificar;
-            do
-            {
-                Console.WriteLine("Ingrese el indice de la materia a modificar");
-            } while (!int.TryParse(Console.ReadLine(), out opcionAModificar));
+            int opcionAModificar = validarNumero("Ingrese el indice de la materia a modifiar");
 
             if (listaMaterias.Exists(materia => materia.indice == opcionAModificar))
             {
@@ -465,8 +562,7 @@ namespace ProyectoProg1
                     {
                         Materia materia = new Materia();
                         materia = listaMaterias[i];
-                        Console.WriteLine("Ingrese el nombre de la materia");
-                        materia.nombreMateria = Console.ReadLine();
+                        materia.nombreMateria = stringValido("Ingrese el nombre de la materia");
                         // TODO NOMBRE MATERIA NO DEBE ESTAR DUPLICADO
                         Console.WriteLine("Materia modificada correctamente");
                         listaMaterias[i] = materia;
@@ -497,7 +593,7 @@ namespace ProyectoProg1
                 Console.WriteLine("*          3 - Modificacion materia *");
                 Console.WriteLine("*          4 - Mostrar materias     *");
                 Console.WriteLine("*                                   *");
-                Console.WriteLine("*          0 - Salir                *");
+                Console.WriteLine("*          0 - Volver               *");
                 Console.WriteLine("*************************************");
                 opcion = Console.ReadLine();
                 Console.Clear();
@@ -546,11 +642,7 @@ namespace ProyectoProg1
 
         static void InscribirAlumno()
         {
-            int dniIngresado;
-            do
-            {
-                Console.WriteLine("Ingrese el dni del alumno");
-            } while (!int.TryParse(Console.ReadLine(), out dniIngresado));
+            int dniIngresado = validarNumero("Ingrese el dni del alumno a inscribir");
             List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
             List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
             List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
@@ -560,6 +652,17 @@ namespace ProyectoProg1
             bool existeAlumno = false;
             bool existeMateria = false;
             int indiceInscripcion = 0;
+
+            if (TraerInscripcionDeArchivo(inscripcionPath) != null && TraerInscripcionDeArchivo(inscripcionPath).Count() > 0)
+            {
+                listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
+                indiceInscripcion = listaInscripcion.Count;
+            }
+            else
+            {
+                indiceInscripcion = 0;
+            }
+
 
             if (listaAlumnos.Exists(alumno => alumno.dni == dniIngresado))
             {
@@ -580,11 +683,9 @@ namespace ProyectoProg1
             if (existeAlumno)
             {
 
-                int indiceMateria;
-                do
-                {
-                    Console.WriteLine("Ingrese indice de la materia a inscribirse"); // o ya inscripto?
-                } while (!int.TryParse(Console.ReadLine(), out indiceMateria));
+                int indiceMateria = validarNumero("Ingrese indice de la materia a inscribir al alumno");
+                // o ya inscripto?
+
 
                 if (listaMaterias.Exists(materia => materia.indice == indiceMateria))
                 {
@@ -605,30 +706,31 @@ namespace ProyectoProg1
 
             if (existeMateria)
             {
+                int i = 0;
+                bool alumnoInscripto = listaInscripcion.Exists(inscripcion => inscripcion.indice_alumno == alumno.indice && inscripcion.indice_materia == materia.indice);
+                if (alumnoInscripto)
+                {
+                    Console.WriteLine("El alumno ya esta inscripto a esta materia, vaya a la seccion de modificacion");
+                    return;
+                }
+
                 Inscripcion inscripcion = new Inscripcion();
                 inscripcion.indice = ++indiceInscripcion;
                 inscripcion.indice_alumno = alumno.indice;
                 inscripcion.indice_materia = materia.indice;
-                char cursoChar;
-                do
-                {
-                    Console.WriteLine("El alumno curso la materia? s/n");
-                } while (!char.TryParse(Console.ReadLine(), out cursoChar) || (cursoChar != 's' && cursoChar != 'n'));
+                char cursoChar = validarCharSON("El alumno cursó la materia? s/n");
                 inscripcion.estado = "Anotado";
                 if (cursoChar == 's')
                 {
-                    char rindioChar;
-                    do
-                    {
-                        Console.WriteLine("El alumno curso la materia? s/n");
-                    } while (!char.TryParse(Console.ReadLine(), out rindioChar) || (rindioChar != 's' && rindioChar != 'n'));
+                    char rindioChar = validarCharSON("El alumno rindió el final? s/n");
                     if (rindioChar == 's')
                     {
                         double notaIngresada;
                         do
                         {
                             Console.WriteLine("Ingrese la nota del alumno entre 1 y 10");
-                        } while (!double.TryParse(Console.ReadLine(), out notaIngresada));
+                        } while (!double.TryParse(Console.ReadLine(), out notaIngresada) || (notaIngresada < 1 && notaIngresada > 10));
+
                         inscripcion.nota = notaIngresada;
                         if (notaIngresada >= 6 && notaIngresada <= 10)
                         {
@@ -638,8 +740,7 @@ namespace ProyectoProg1
                         {
                             inscripcion.estado = "Desaprobado";
                         }
-                        Console.WriteLine("Ingrese la fecha del parcial en formato dd/mm/yy");
-                        inscripcion.fecha = Console.ReadLine();
+                        inscripcion.fecha = fechaValida("del parcial");
                     }
                     else
                     {
@@ -647,10 +748,9 @@ namespace ProyectoProg1
                     }
                 }
                 nuevaInscripcion.Add(inscripcion);
-
-                Console.WriteLine($"{inscripcion.indice},{inscripcion.indice_alumno}, {inscripcion.indice_materia}, {inscripcion.estado}, {inscripcion.nota}, {inscripcion.fecha}");
                 Console.WriteLine("Alumno inscripto correctamente");
                 EscribirInscripcionEnArchivo(nuevaInscripcion, true);
+
             }
 
         }
@@ -697,34 +797,48 @@ namespace ProyectoProg1
 
         static void EstadoInscripcionAlumno()
         {
+            List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
             List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
-            int indiceAlumno;
-            do
-            {
-                Console.WriteLine("Ingrese indice del alumno para ver su estado");
-            } while (!int.TryParse(Console.ReadLine(), out indiceAlumno));
+            int indiceAlumno = validarNumero("Ingrese indice del alumno para ver su estado");
+            Inscripcion alumnoYaInscripto = new Inscripcion();
             Console.Clear();
             if (listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
             {
                 string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
                 Console.WriteLine(linea);
-                for (int i = 0; i < listaInscripcion.Count; i++)
+                string nombreMateria;
+                foreach (Inscripcion inscripcion in listaInscripcion)
                 {
-                    if (indiceAlumno == listaInscripcion[i].indice_alumno)
+                    if (inscripcion.indice_alumno == indiceAlumno)
                     {
-                        Console.WriteLine($"{listaInscripcion[i].indice.ToString().PadRight(10)}{listaInscripcion[i].indice_alumno.ToString().PadRight(10)}{listaInscripcion[i].indice_materia.ToString().PadRight(20)}{listaInscripcion[i].estado.PadRight(15)}{listaInscripcion[i].nota.ToString().PadRight(10)}{listaInscripcion[i].fecha}");
+                        nombreMateria = "";
+                        int i = 0;
+                        bool encontre = false;
+                        while (i < listaMaterias.Count && !encontre)
+                        {
+                            if (inscripcion.indice_materia == listaMaterias[i].indice)
+                            {
+                                encontre = true;
+                                nombreMateria = listaMaterias[i].nombreMateria;
+                            }
+                            i++;
+                        }
+                        string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
+                        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
                     }
                 }
                 Console.WriteLine();
-                char opcionChar;
-                do
-                {
-                    Console.WriteLine("Desea modificar el alumno? s/n");
-                } while (!char.TryParse(Console.ReadLine(), out opcionChar) || (opcionChar != 's' && opcionChar != 'n'));
+                /*
+                char opcionChar = validarCharSON("Desea modificar el alumno? s/n");
                 if (opcionChar == 's')
                 {
-                    InscribirAlumno();
-                }
+                    int numeroIngresado;
+                    do
+                    {
+                        Console.WriteLine("Ingrese el indice de la  materia que desea modificar");
+                    } while (!int.TryParse(Console.ReadLine(), out numeroIngresado) || numeroIngresado < 0 && numeroIngresado > listaMaterias.Count);
+
+                }*/
             }
             else
             {
@@ -748,7 +862,7 @@ namespace ProyectoProg1
                 Console.WriteLine("*          3 - Modificar estado     *");
                 Console.WriteLine("*          4 - Mostar todo          *");
                 Console.WriteLine("*                                   *");
-                Console.WriteLine("*          0 - Salir                *");
+                Console.WriteLine("*          0 - Volver               *");
                 Console.WriteLine("*************************************");
                 opcion = Console.ReadLine();
                 Console.Clear();
@@ -784,6 +898,7 @@ namespace ProyectoProg1
                                 encontre = true;
                                 nombreMateria = listaMaterias[i].nombreMateria;
                             }
+                            i++;
                         }
 
                         string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
