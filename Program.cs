@@ -1,4 +1,6 @@
-﻿namespace ProyectoProg1
+﻿using static ProyectoProg1.Program;
+
+namespace ProyectoProg1
 {
     internal class Program
     {
@@ -551,6 +553,7 @@
             } while (!int.TryParse(Console.ReadLine(), out dniIngresado));
             List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
             List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
+            List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
             List<Inscripcion> nuevaInscripcion = new List<Inscripcion>();
             Alumno alumno = new Alumno();
             Materia materia = new Materia();
@@ -576,6 +579,7 @@
 
             if (existeAlumno)
             {
+
                 int indiceMateria;
                 do
                 {
@@ -605,8 +609,45 @@
                 inscripcion.indice = ++indiceInscripcion;
                 inscripcion.indice_alumno = alumno.indice;
                 inscripcion.indice_materia = materia.indice;
+                char cursoChar;
+                do
+                {
+                    Console.WriteLine("El alumno curso la materia? s/n");
+                } while (!char.TryParse(Console.ReadLine(), out cursoChar) || (cursoChar != 's' && cursoChar != 'n'));
                 inscripcion.estado = "Anotado";
+                if (cursoChar == 's')
+                {
+                    char rindioChar;
+                    do
+                    {
+                        Console.WriteLine("El alumno curso la materia? s/n");
+                    } while (!char.TryParse(Console.ReadLine(), out rindioChar) || (rindioChar != 's' && rindioChar != 'n'));
+                    if (rindioChar == 's')
+                    {
+                        double notaIngresada;
+                        do
+                        {
+                            Console.WriteLine("Ingrese la nota del alumno entre 1 y 10");
+                        } while (!double.TryParse(Console.ReadLine(), out notaIngresada));
+                        inscripcion.nota = notaIngresada;
+                        if (notaIngresada >= 6 && notaIngresada <= 10)
+                        {
+                            inscripcion.estado = "Aprobado";
+                        }
+                        else
+                        {
+                            inscripcion.estado = "Desaprobado";
+                        }
+                        Console.WriteLine("Ingrese la fecha del parcial en formato dd/mm/yy");
+                        inscripcion.fecha = Console.ReadLine();
+                    }
+                    else
+                    {
+                        inscripcion.estado = "Cursado";
+                    }
+                }
                 nuevaInscripcion.Add(inscripcion);
+
                 Console.WriteLine($"{inscripcion.indice},{inscripcion.indice_alumno}, {inscripcion.indice_materia}, {inscripcion.estado}, {inscripcion.nota}, {inscripcion.fecha}");
                 Console.WriteLine("Alumno inscripto correctamente");
                 EscribirInscripcionEnArchivo(nuevaInscripcion, true);
@@ -662,22 +703,33 @@
             {
                 Console.WriteLine("Ingrese indice del alumno para ver su estado");
             } while (!int.TryParse(Console.ReadLine(), out indiceAlumno));
-
-            if(listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
+            Console.Clear();
+            if (listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
             {
-                for(int i = 0; i < listaInscripcion.Count; i++)
+                string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
+                Console.WriteLine(linea);
+                for (int i = 0; i < listaInscripcion.Count; i++)
                 {
-                    if (listaInscripcion[i].indice_alumno == indiceAlumno)
+                    if (indiceAlumno == listaInscripcion[i].indice_alumno)
                     {
-                        Inscripcion inscripcion = listaInscripcion[i];
-                        Console.WriteLine("Ingrese ");
+                        Console.WriteLine($"{listaInscripcion[i].indice.ToString().PadRight(10)}{listaInscripcion[i].indice_alumno.ToString().PadRight(10)}{listaInscripcion[i].indice_materia.ToString().PadRight(20)}{listaInscripcion[i].estado.PadRight(15)}{listaInscripcion[i].nota.ToString().PadRight(10)}{listaInscripcion[i].fecha}");
                     }
                 }
-            }else
+                Console.WriteLine();
+                char opcionChar;
+                do
+                {
+                    Console.WriteLine("Desea modificar el alumno? s/n");
+                } while (!char.TryParse(Console.ReadLine(), out opcionChar) || (opcionChar != 's' && opcionChar != 'n'));
+                if (opcionChar == 's')
+                {
+                    InscribirAlumno();
+                }
+            }
+            else
             {
                 Console.WriteLine("No se encontro ningun alumno con ese indice");
             }
-            
         }
 
         static void MenuInscripciones()
@@ -701,6 +753,7 @@
                 opcion = Console.ReadLine();
                 Console.Clear();
                 List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
+                List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
                 if (opcion == "1")
                 {
                     InscribirAlumno();
@@ -708,6 +761,7 @@
                 else if (opcion == "2")
                 {
                     EstadoInscripcionAlumno();
+
                 }
                 else if (opcion == "3")
                 {
@@ -715,11 +769,25 @@
                 }
                 else if (opcion == "4")
                 {
-                    string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(10) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
+                    string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
                     Console.WriteLine(linea);
+                    string nombreMateria;
                     foreach (Inscripcion inscripcion in listaInscripcion)
                     {
-                        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{inscripcion.indice_materia.ToString().PadRight(10)}{inscripcion.estado.PadRight(15)}{inscripcion.nota.ToString().PadRight(10)}{inscripcion.fecha}");
+                        nombreMateria = "";
+                        int i = 0;
+                        bool encontre = false;
+                        while (i < listaMaterias.Count && !encontre)
+                        {
+                            if (inscripcion.indice_materia == listaMaterias[i].indice)
+                            {
+                                encontre = true;
+                                nombreMateria = listaMaterias[i].nombreMateria;
+                            }
+                        }
+
+                        string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
+                        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
                     }
                 }
             } while (opcion != "0");
@@ -775,4 +843,4 @@
 // tiene que hacer un crud o solo ingresar y leer
 // tengo que ingresar la fecha 1x1? o formato dd/mm/yyyy
 // nota al estar anotado me aparece en 0
-// si modifica, al modificarlo como se a cual materia apunta?
+// si modifica, al modificarlo como se a cual materia apunta? doble check
