@@ -174,7 +174,7 @@ namespace ProyectoProg1
         // ------------------------------------------------------------ ALUMNOSSS ------------------------------------------------------
 
         // DAR DE ALTA UN ALUMNOOOOO
-        static void AltaAlumno(ref Alumno nuevoAlumno)
+        static void AltaAlumno()
         {
             List<Alumno> listita = new List<Alumno>();
             List<Alumno> listaVacia = new List<Alumno>();
@@ -223,7 +223,6 @@ namespace ProyectoProg1
             {
                 alumno.indice = ++indiceDeAlumno;
                 alumno.nombre = stringValido("Ingrese nombre del alumno");
-                Console.WriteLine("Ingrese apellido del alumno");
                 alumno.apellido = stringValido("Ingrese apellido del alumno");
                 alumno.dni = dni;
                 string fechaIngresada = "";
@@ -232,12 +231,11 @@ namespace ProyectoProg1
                     fechaIngresada = fechaValida("de nacimiento");
 
                 } while (fechaIngresada == "");
-               
+
                 alumno.fechaNacimiento = fechaIngresada;
                 alumno.domicilio = stringValido("Ingrese domicilio");
                 alumno.estaActivo = true;
-                nuevoAlumno = alumno;
-                listaVacia.Add(nuevoAlumno);
+                listaVacia.Add(alumno);
                 Console.WriteLine("Alumno ingresado correctamente");
                 Console.WriteLine();
                 EscribirAlumnoEnArchivo(listaVacia, true);
@@ -288,9 +286,8 @@ namespace ProyectoProg1
         }
 
         // BAJA ALUMNOOOOO
-        public static void BajaAlumno()
+        public static void BajaAlumno(List<Alumno> listaAlumnos)
         {
-            List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
             int dniAlumno = validarNumero("Ingrese el dni del alumno a dar de baja");
 
             if (listaAlumnos.Any(elemento => elemento.dni == dniAlumno))
@@ -376,44 +373,56 @@ namespace ProyectoProg1
 
                 if (opcion == "1") //Alta alumno
                 {
-                    Alumno nuevoAlumno = new Alumno();
-                    AltaAlumno(ref nuevoAlumno);
+                    AltaAlumno();
                 }
                 else if (opcion == "2") // Baja alumno
                 {
-                    BajaAlumno();
+                    BajaAlumno(listaAlumnos);
                 }
                 else if (opcion == "3") // Modificacion alumno
                 {
-                    //List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
                     ModificarAlumno(listaAlumnos);
                 }
                 else if (opcion == "4") // Alumnos activos
                 {
-                    Console.WriteLine("------------- ALUMNOS ACTIVOS --------------");
-                    //List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
-                    Console.WriteLine(linea);
-                    foreach (Alumno alumno in listaAlumnos)
+                    if (listaAlumnos.Count > 0)
                     {
-                        if (alumno.estaActivo == true)
+                        Console.WriteLine("------------- ALUMNOS ACTIVOS --------------");
+                        Console.WriteLine(linea);
+                        foreach (Alumno alumno in listaAlumnos)
                         {
-                            Console.Write($"{alumno.indice.ToString().PadRight(10)}{alumno.nombre.PadRight(20)}{alumno.apellido.PadRight(15)}{alumno.dni.ToString().PadRight(10)}{alumno.fechaNacimiento.PadRight(15)}{alumno.domicilio.PadRight(15)}{alumno.estaActivo} ");
-                            Console.WriteLine();
+                            if (alumno.estaActivo == true)
+                            {
+                                Console.Write($"{alumno.indice.ToString().PadRight(10)}{alumno.nombre.PadRight(20)}{alumno.apellido.PadRight(15)}{alumno.dni.ToString().PadRight(10)}{alumno.fechaNacimiento.PadRight(15)}{alumno.domicilio.PadRight(15)}{alumno.estaActivo} ");
+                                Console.WriteLine();
+                            }
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No hay alumnos ingresados");
                     }
                 }
                 else if (opcion == "5") // Alumnos inactivos
                 {
-                    Console.WriteLine("------------- ALUMNOS INACTIVOS ------------");
-                    //List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
-                    Console.WriteLine(linea);
-                    foreach (Alumno alumno in listaAlumnos)
+                    if (listaAlumnos.Count > 0)
                     {
-                        if (alumno.estaActivo == false)
+
+                        Console.WriteLine("------------- ALUMNOS INACTIVOS ------------");
+                        //List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
+                        Console.WriteLine(linea);
+                        foreach (Alumno alumno in listaAlumnos)
                         {
-                            Console.Write($"{alumno.indice.ToString().PadRight(10)}{alumno.nombre.PadRight(20)}{alumno.apellido.PadRight(15)}{alumno.dni.ToString().PadRight(10)}{alumno.fechaNacimiento.PadRight(15)}{alumno.domicilio.PadRight(15)}{alumno.estaActivo} ");
-                            Console.WriteLine();
+                            if (alumno.estaActivo == false)
+                            {
+                                Console.Write($"{alumno.indice.ToString().PadRight(10)}{alumno.nombre.PadRight(20)}{alumno.apellido.PadRight(15)}{alumno.dni.ToString().PadRight(10)}{alumno.fechaNacimiento.PadRight(15)}{alumno.domicilio.PadRight(15)}{alumno.estaActivo} ");
+                                Console.WriteLine();
+                            }
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No hay alumnos ingresados");
                     }
                 }
             } while (opcion != "0");
@@ -427,7 +436,7 @@ namespace ProyectoProg1
 
 
         // ALTA MATERIAAA
-        public static void AltaMateria(ref Materia nuevaMateria)
+        public static void AltaMateria()
         {
             List<Materia> listaMaterias = new List<Materia>();
             List<Materia> listaMateriasVacia = new List<Materia>();
@@ -442,7 +451,7 @@ namespace ProyectoProg1
             {
                 indiceMateria = 0;
             }
-            
+
             string nombreMateria = stringValido("Ingrese nombre de la materia");
             if (listaMaterias.Exists(materia => materia.nombreMateria.ToLower() == nombreMateria.ToLower()))
             {
@@ -525,23 +534,23 @@ namespace ProyectoProg1
 
         // BAJA MATERIAAAA
 
-        public static void BajaMateria()
+        public static void BajaMateria(List<Materia> listaMaterias)
         {
-            List<Materia> materias = TraerMateriasDeArchivo(materiasPath);
+            
             int indiceMateria = validarNumero("Ingrese el indice de la materia que quiere dar de baja");
-            if (materias.Exists(materia => materia.indice == indiceMateria))
+            if (listaMaterias.Exists(materia => materia.indice == indiceMateria))
             {
-                for (int i = 0; i < materias.Count; i++)
+                for (int i = 0; i < listaMaterias.Count; i++)
                 {
-                    if (materias[i].indice == indiceMateria)
+                    if (listaMaterias[i].indice == indiceMateria)
                     {
-                        Materia materia = materias[i];
+                        Materia materia = listaMaterias[i];
                         materia.estaActiva = false;
                         Console.WriteLine("La materia fue dada de baja correctamente");
-                        materias[i] = materia;
+                        listaMaterias[i] = materia;
                     }
                 }
-                EscribirMateriaEnArchivo(materias, false);
+                EscribirMateriaEnArchivo(listaMaterias, false);
             }
             else
             {
@@ -562,10 +571,19 @@ namespace ProyectoProg1
                     {
                         Materia materia = new Materia();
                         materia = listaMaterias[i];
-                        materia.nombreMateria = stringValido("Ingrese el nombre de la materia");
-                        // TODO NOMBRE MATERIA NO DEBE ESTAR DUPLICADO
-                        Console.WriteLine("Materia modificada correctamente");
-                        listaMaterias[i] = materia;
+                        string nuevoNombreMateria = stringValido("Ingrese el nombre de la materia");
+                        if (listaMaterias.Exists(materia => materia.nombreMateria == nuevoNombreMateria))
+                        {
+                            Console.WriteLine("El nombre de la materia ya existe");
+                            return;
+                        }
+                        else
+                        {
+                            materia.nombreMateria = nuevoNombreMateria;
+                            Console.WriteLine("Materia modificada correctamente");
+                            listaMaterias[i] = materia;
+                        }
+
                     }
                 }
                 EscribirMateriaEnArchivo(listaMaterias, false);
@@ -599,18 +617,18 @@ namespace ProyectoProg1
                 Console.Clear();
                 string linea = "INDICE".PadRight(10) + "NOMBRE".PadRight(20) + "ACTIVA";
                 List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
+
                 if (opcion == "1")
                 {
-                    Materia nuevaMateria = new Materia();
-                    AltaMateria(ref nuevaMateria);
+                    
+                    AltaMateria();
                 }
                 else if (opcion == "2")
                 {
-                    BajaMateria();
+                    BajaMateria(listaMaterias);
                 }
                 else if (opcion == "3")
                 {
-                    Console.WriteLine("Modificar materia");
                     ModificarMateria(listaMaterias);
                 }
                 else if (opcion == "4")
@@ -640,12 +658,12 @@ namespace ProyectoProg1
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
 
-        static void InscribirAlumno()
+        static void InscribirAlumno(List<Inscripcion> listaInscripcion, List<Materia> listaMaterias)
         {
             int dniIngresado = validarNumero("Ingrese el dni del alumno a inscribir");
             List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
-            List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
-            List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
+            // List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
+            // List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
             List<Inscripcion> nuevaInscripcion = new List<Inscripcion>();
             Alumno alumno = new Alumno();
             Materia materia = new Materia();
@@ -870,7 +888,7 @@ namespace ProyectoProg1
                 List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
                 if (opcion == "1")
                 {
-                    InscribirAlumno();
+                    InscribirAlumno(listaInscripcion, listaMaterias);
                 }
                 else if (opcion == "2")
                 {
@@ -959,3 +977,5 @@ namespace ProyectoProg1
 // tengo que ingresar la fecha 1x1? o formato dd/mm/yyyy
 // nota al estar anotado me aparece en 0
 // si modifica, al modificarlo como se a cual materia apunta? doble check
+// linea 330 midificar alumno si ingresa otro dni ya existente...
+// linea 575 nombre de la materia ya existe
