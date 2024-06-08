@@ -42,14 +42,14 @@ namespace ProyectoProg1
         // ------------------------------------------------------------ UTILIDADES -----------------------------------------------------
 
         // VALIDAR CHAR
+
         static char validarCharSON(string mensaje)
         {
             char opcionChar;
             do
             {
                 Console.WriteLine(mensaje);
-            } while (!char.TryParse(Console.ReadLine(), out opcionChar) || (opcionChar != 's' && opcionChar != 'n'));
-
+            } while (!char.TryParse(Console.ReadLine(), out opcionChar) || (opcionChar != 's' && opcionChar != 'n' && opcionChar != 'S' && opcionChar != 'N'));
             return opcionChar;
         }
 
@@ -80,6 +80,7 @@ namespace ProyectoProg1
         }
 
         // PEDIR MES
+
         static int pedirMes(string mensaje)
         {
             int mes;
@@ -103,11 +104,13 @@ namespace ProyectoProg1
             return anio;
         }
 
-        static bool esBiciesto(int anio)
+        // ES BISIESTO
+        static bool esBisiesto(int anio)
         {
             return (anio % 4 == 0 && (anio % 100 != 0 || anio % 400 == 0));
         }
 
+        // PEDIR FECHA VALIDA
         static string fechaValida(string mensaje)
         {
             int dia, mes, anio;
@@ -126,7 +129,7 @@ namespace ProyectoProg1
             }
             else if (mes == 2)
             {
-                if (esBiciesto(anio))
+                if (esBisiesto(anio))
                 {
                     if (dia > 29)
                     {
@@ -152,7 +155,7 @@ namespace ProyectoProg1
             return fechaValida;
         }
 
-        // PEDIR STRING NO NULL
+        // PEDIR STRING NO NULL SIN ,
 
         static string stringValido(string mensaje)
         {
@@ -161,8 +164,7 @@ namespace ProyectoProg1
             {
                 Console.WriteLine(mensaje);
                 cadena = Console.ReadLine();
-            } while (cadena.Length < 1);
-
+            } while (cadena.Length < 1 || cadena.Contains(','));
             return cadena;
         }
 
@@ -176,14 +178,14 @@ namespace ProyectoProg1
         // DAR DE ALTA UN ALUMNOOOOO
         static void AltaAlumno()
         {
-            List<Alumno> listita = new List<Alumno>();
+            List<Alumno> listaExistente = new List<Alumno>();
             List<Alumno> listaVacia = new List<Alumno>();
             int indiceDeAlumno;
 
             if (TraerAlumnosDeArchivo(alumnosPath) != null && TraerAlumnosDeArchivo(alumnosPath).Count() > 0)
             {
-                listita = TraerAlumnosDeArchivo(alumnosPath);
-                indiceDeAlumno = listita.Count;
+                listaExistente = TraerAlumnosDeArchivo(alumnosPath);
+                indiceDeAlumno = listaExistente.Count;
             }
             else
             {
@@ -193,24 +195,25 @@ namespace ProyectoProg1
             Alumno alumno = new Alumno();
             int dni = validarNumero("Ingrese DNI");
 
-            if (listita.Exists(alumno => alumno.dni == dni))
+            if (listaExistente.Exists(alumno => alumno.dni == dni))
             {
-                for (int i = 0; i < listita.Count; i++)
+                for (int i = 0; i < listaExistente.Count; i++)
                 {
-                    if (listita[i].dni == dni)
+                    if (listaExistente[i].dni == dni)
                     {
-                        if (listita[i].estaActivo == false)
+                        if (listaExistente[i].estaActivo == false)
                         {
                             Console.WriteLine("El alumno con el dni ingresado se encuentra en la base de datos pero está desactivado");
                             char opcionElegida = validarCharSON("Desea activarlo? s/n");
-                            if (opcionElegida == 's')
+                            if (opcionElegida == 's' || opcionElegida == 'S')
                             {
-                                Alumno al = listita[i];
+                                Alumno al = listaExistente[i];
                                 al.estaActivo = true;
-                                listita[i] = al;
+                                listaExistente[i] = al;
+                                Console.Clear();
                                 Console.WriteLine("Alumno activado correctamente");
                             }
-                            EscribirAlumnoEnArchivo(listita, false);
+                            EscribirAlumnoEnArchivo(listaExistente, false);
                         }
                         else
                         {
@@ -229,13 +232,13 @@ namespace ProyectoProg1
                 do
                 {
                     fechaIngresada = fechaValida("de nacimiento");
-
                 } while (fechaIngresada == "");
 
                 alumno.fechaNacimiento = fechaIngresada;
                 alumno.domicilio = stringValido("Ingrese domicilio");
                 alumno.estaActivo = true;
                 listaVacia.Add(alumno);
+                Console.Clear();
                 Console.WriteLine("Alumno ingresado correctamente");
                 Console.WriteLine();
                 EscribirAlumnoEnArchivo(listaVacia, true);
@@ -290,7 +293,7 @@ namespace ProyectoProg1
         {
             int dniAlumno = validarNumero("Ingrese el dni del alumno a dar de baja");
 
-            if (listaAlumnos.Any(elemento => elemento.dni == dniAlumno))
+            if (listaAlumnos.Exists(elemento => elemento.dni == dniAlumno))
             {
                 for (int i = 0; i < listaAlumnos.Count; i++)
                 {
@@ -323,16 +326,10 @@ namespace ProyectoProg1
                         Alumno alumnoModificado = listaAlumnos[i];
                         alumnoModificado.nombre = stringValido("Ingrese nombre del alumno");
                         alumnoModificado.apellido = stringValido("Ingrese apellido del alumno");
-                        int dni = validarNumero("Ingrese DNI");
-                        // TODO ingresa dni de otro alumno
-                        // for(int j = 0;i < listaAlumnos.Count; i++)
-                        // {
-                        //     if (listaAlumnos[j].dni)
-                        // }
-                        alumnoModificado.dni = dni;
                         alumnoModificado.fechaNacimiento = fechaValida("de nacimiento");
                         alumnoModificado.domicilio = stringValido("Ingrese domicilio");
                         listaAlumnos[i] = alumnoModificado;
+                        Console.Clear();
                         Console.WriteLine("Alumno modificado correctamente");
                         Console.WriteLine();
                     }
@@ -409,7 +406,6 @@ namespace ProyectoProg1
                     {
 
                         Console.WriteLine("------------- ALUMNOS INACTIVOS ------------");
-                        //List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
                         Console.WriteLine(linea);
                         foreach (Alumno alumno in listaAlumnos)
                         {
@@ -438,14 +434,14 @@ namespace ProyectoProg1
         // ALTA MATERIAAA
         public static void AltaMateria()
         {
-            List<Materia> listaMaterias = new List<Materia>();
+            List<Materia> listaMateriasExistentes = new List<Materia>();
             List<Materia> listaMateriasVacia = new List<Materia>();
             int indiceMateria;
 
             if (TraerMateriasDeArchivo(materiasPath) != null && TraerMateriasDeArchivo(materiasPath).Count() > 0)
             {
-                listaMaterias = TraerMateriasDeArchivo(materiasPath);
-                indiceMateria = listaMaterias.Count;
+                listaMateriasExistentes = TraerMateriasDeArchivo(materiasPath);
+                indiceMateria = listaMateriasExistentes.Count;
             }
             else
             {
@@ -453,25 +449,26 @@ namespace ProyectoProg1
             }
 
             string nombreMateria = stringValido("Ingrese nombre de la materia");
-            if (listaMaterias.Exists(materia => materia.nombreMateria.ToLower() == nombreMateria.ToLower()))
+            if (listaMateriasExistentes.Exists(materia => materia.nombreMateria.ToLower() == nombreMateria.ToLower()))
             {
-                for (int i = 0; i < listaMaterias.Count; i++)
+                for (int i = 0; i < listaMateriasExistentes.Count; i++)
                 {
-                    if (listaMaterias[i].nombreMateria == nombreMateria)
+                    if (listaMateriasExistentes[i].nombreMateria == nombreMateria)
                     {
-                        if (listaMaterias[i].estaActiva == false)
+                        if (listaMateriasExistentes[i].estaActiva == false)
                         {
                             Console.WriteLine("La materia se encuentra en la base de datos pero está desactivada");
                             char opcionActivar = validarCharSON("Desea activarla? s/n");
-                            if (opcionActivar == 's')
+                            if (opcionActivar == 's' || opcionActivar == 'S')
                             {
                                 Materia materiaAModificar = new Materia();
-                                materiaAModificar = listaMaterias[i];
+                                materiaAModificar = listaMateriasExistentes[i];
                                 materiaAModificar.estaActiva = true;
-                                listaMaterias[i] = materiaAModificar;
+                                listaMateriasExistentes[i] = materiaAModificar;
+                                Console.Clear();
                                 Console.WriteLine("Materia activada correctamente");
                             }
-                            EscribirMateriaEnArchivo(listaMaterias, false);
+                            EscribirMateriaEnArchivo(listaMateriasExistentes, false);
                         }
                         else
                         {
@@ -487,8 +484,9 @@ namespace ProyectoProg1
                 materia.nombreMateria = nombreMateria;
                 materia.estaActiva = true;
                 listaMateriasVacia.Add(materia);
+                Console.Clear();
+                Console.WriteLine($"Materia ingresada correctamente con el inidice {materia.indice}");
                 Console.WriteLine();
-                Console.WriteLine("Materia ingresada correctamente");
                 EscribirMateriaEnArchivo(listaMateriasVacia, true);
             }
         }
@@ -583,7 +581,6 @@ namespace ProyectoProg1
                             Console.WriteLine("Materia modificada correctamente");
                             listaMaterias[i] = materia;
                         }
-
                     }
                 }
                 EscribirMateriaEnArchivo(listaMaterias, false);
@@ -618,20 +615,19 @@ namespace ProyectoProg1
                 string linea = "INDICE".PadRight(10) + "NOMBRE".PadRight(20) + "ACTIVA";
                 List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
 
-                if (opcion == "1")
+                if (opcion == "1") // Alta materia
                 {
-
                     AltaMateria();
                 }
-                else if (opcion == "2")
+                else if (opcion == "2") // Baja materia
                 {
                     BajaMateria(listaMaterias);
                 }
-                else if (opcion == "3")
+                else if (opcion == "3") // Modificar materia
                 {
                     ModificarMateria(listaMaterias);
                 }
-                else if (opcion == "4")
+                else if (opcion == "4") // Mostrar materias
                 {
                     if (listaMaterias.Count() != 0)
                     {
@@ -658,12 +654,12 @@ namespace ProyectoProg1
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
         // ---------------------------------------------------------- INSCRIPCIONES ------------------------------------------------------
 
-        static void InscribirAlumno(List<Inscripcion> listaInscripcion, List<Materia> listaMaterias)
+        // INSCRIBIR ALUMNO
+
+        static void InscribirAlumno(List<Inscripcion> listaInscripcionExistente, List<Materia> listaMateriasExistente)
         {
             int dniIngresado = validarNumero("Ingrese el dni del alumno a inscribir");
-            List<Alumno> listaAlumnos = TraerAlumnosDeArchivo(alumnosPath);
-            // List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
-            // List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
+            List<Alumno> listaAlumnosExistente = TraerAlumnosDeArchivo(alumnosPath);
             List<Inscripcion> nuevaInscripcion = new List<Inscripcion>();
             Alumno alumno = new Alumno();
             Materia materia = new Materia();
@@ -673,8 +669,8 @@ namespace ProyectoProg1
 
             if (TraerInscripcionDeArchivo(inscripcionPath) != null && TraerInscripcionDeArchivo(inscripcionPath).Count() > 0)
             {
-                listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
-                indiceInscripcion = listaInscripcion.Count;
+                listaInscripcionExistente = TraerInscripcionDeArchivo(inscripcionPath);
+                indiceInscripcion = listaInscripcionExistente.Count;
             }
             else
             {
@@ -682,14 +678,20 @@ namespace ProyectoProg1
             }
 
 
-            if (listaAlumnos.Exists(alumno => alumno.dni == dniIngresado))
+            if (listaAlumnosExistente.Exists(alumno => alumno.dni == dniIngresado))
             {
-                for (int i = 0; i < listaAlumnos.Count; i++)
+                for (int i = 0; i < listaAlumnosExistente.Count; i++)
                 {
-                    if (listaAlumnos[i].dni == dniIngresado)
+                    if (listaAlumnosExistente[i].dni == dniIngresado)
                     {
+                        if (listaAlumnosExistente[i].estaActivo == true)
+                        {
                         existeAlumno = true;
-                        alumno = listaAlumnos[i];
+                        alumno = listaAlumnosExistente[i];
+                        }else
+                        {
+                            Console.WriteLine("El alumno está desactivado, por favor activelo o elija otro alumno");
+                        }
                     }
                 }
             }
@@ -702,17 +704,21 @@ namespace ProyectoProg1
             {
 
                 int indiceMateria = validarNumero("Ingrese indice de la materia a inscribir al alumno");
-                // o ya inscripto?
 
-
-                if (listaMaterias.Exists(materia => materia.indice == indiceMateria))
+                if (listaMateriasExistente.Exists(materia => materia.indice == indiceMateria))
                 {
-                    for (int i = 0; i < listaMaterias.Count; i++)
+                    for (int i = 0; i < listaMateriasExistente.Count; i++)
                     {
-                        if (listaMaterias[i].indice == indiceMateria)
+                        if (listaMateriasExistente[i].indice == indiceMateria)
                         {
-                            existeMateria = true;
-                            materia = listaMaterias[i];
+                            if (listaMateriasExistente[i].estaActiva == true)
+                            {
+                                existeMateria = true;
+                                materia = listaMateriasExistente[i];
+                            }else
+                            {
+                                Console.WriteLine("La materia está desactivada por favor activela o elija otra materia");
+                            }
                         }
                     }
                 }
@@ -724,12 +730,12 @@ namespace ProyectoProg1
 
             if (existeMateria)
             {
-                int i = 0;
-                bool alumnoInscripto = listaInscripcion.Exists(inscripcion => inscripcion.indice_alumno == alumno.indice && inscripcion.indice_materia == materia.indice);
+                bool alumnoInscripto = listaInscripcionExistente.Exists(inscripcion => inscripcion.indice_alumno == alumno.indice && inscripcion.indice_materia == materia.indice);
                 if (alumnoInscripto)
                 {
                     Console.WriteLine("El alumno ya esta inscripto a esta materia, vaya a la seccion de modificacion");
                     return;
+                    // o es mejor poner !alumnoInscripto y dejar alumnoInscipto true para el else?
                 }
 
                 Inscripcion inscripcion = new Inscripcion();
@@ -738,10 +744,10 @@ namespace ProyectoProg1
                 inscripcion.indice_materia = materia.indice;
                 char cursoChar = validarCharSON("El alumno cursó la materia? s/n");
                 inscripcion.estado = "Anotado";
-                if (cursoChar == 's')
+                if (cursoChar == 's' || cursoChar == 'S')
                 {
                     char rindioChar = validarCharSON("El alumno rindió el final? s/n");
-                    if (rindioChar == 's')
+                    if (rindioChar == 's' || rindioChar == 'S')
                     {
                         double notaIngresada;
                         do
@@ -766,12 +772,15 @@ namespace ProyectoProg1
                     }
                 }
                 nuevaInscripcion.Add(inscripcion);
+                Console.Clear();
                 Console.WriteLine("Alumno inscripto correctamente");
                 EscribirInscripcionEnArchivo(nuevaInscripcion, true);
 
             }
 
         }
+
+        // ESCRIBIR INSCRIPCION EN ARCHIVO
 
         static void EscribirInscripcionEnArchivo(List<Inscripcion> listaInscripcion, bool concat)
         {
@@ -783,6 +792,8 @@ namespace ProyectoProg1
                 }
             }
         }
+
+        // LEER INSCRIPCION DE ARCHIVO
 
         static List<Inscripcion> TraerInscripcionDeArchivo(string archivo)
         {
@@ -813,12 +824,13 @@ namespace ProyectoProg1
             return listaInscripcion;
         }
 
+        // VER ESTADO DE INSCRIPCION DE UN ALUMNO
+
         static void EstadoInscripcionAlumno()
         {
             List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
             List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
             int indiceAlumno = validarNumero("Ingrese indice del alumno para ver su estado");
-            Inscripcion alumnoYaInscripto = new Inscripcion();
             Console.Clear();
             if (listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
             {
@@ -846,17 +858,6 @@ namespace ProyectoProg1
                     }
                 }
                 Console.WriteLine();
-                /*
-                char opcionChar = validarCharSON("Desea modificar el alumno? s/n");
-                if (opcionChar == 's')
-                {
-                    int numeroIngresado;
-                    do
-                    {
-                        Console.WriteLine("Ingrese el indice de la  materia que desea modificar");
-                    } while (!int.TryParse(Console.ReadLine(), out numeroIngresado) || numeroIngresado < 0 && numeroIngresado > listaMaterias.Count);
-
-                }*/
             }
             else
             {
@@ -864,43 +865,42 @@ namespace ProyectoProg1
             }
         }
 
+        // MODIFICAR INSCRIPCION
+
         static void ModificarInscripcion(List<Inscripcion> listaInscripcion, string linea)
         {
             int indiceAlumno = validarNumero("Ingrese el indice del alumno a modificar");
-            List<Inscripcion> nuevaLista = new List<Inscripcion>();
-           
+
             if (listaInscripcion.Exists(inscr => inscr.indice_alumno == indiceAlumno))
             {
                 Console.Clear();
-                for (int i = 0; i < listaInscripcion.Count; i++)
-                {
-                    if (listaInscripcion[i].indice_alumno == indiceAlumno)
-                    {
-                        // recorrer todas las materias que esta inscripto y preguntar cual quiere modificar
-                        nuevaLista.Add(listaInscripcion[i]);
-                    }
-                }
                 Console.WriteLine(linea);
-                foreach (Inscripcion inscripcion in nuevaLista)
+                foreach (Inscripcion inscripcion in listaInscripcion)
                 {
-                    string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
-                    Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{inscripcion.indice_materia.ToString().PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
+                    if (inscripcion.indice_alumno == indiceAlumno)
+                    {
+                        string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
+                        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{inscripcion.indice_materia.ToString().PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
+                    }
                 }
                 Console.WriteLine();
                 int indiceMateria = validarNumero("Ingrese el indice de la materia a modificar");
-                if (nuevaLista.Exists(materia => materia.indice_materia == indiceMateria))
+
+                if (listaInscripcion.Exists(materia => materia.indice_materia == indiceMateria))
                 {
-                    for(int i = 0;i < nuevaLista.Count; i++)
+                    for (int i = 0; i < listaInscripcion.Count; i++)
                     {
-                        if (nuevaLista[i].indice_materia == indiceMateria)
+                        if (listaInscripcion[i].indice_materia == indiceMateria && listaInscripcion[i].indice_alumno == indiceAlumno)
                         {
-                            Inscripcion inscripcionMod = nuevaLista[i];
+                            Inscripcion inscripcionMod = listaInscripcion[i];
                             char cursoChar = validarCharSON("El alumno cursó la materia? s/n");
                             inscripcionMod.estado = "Anotado";
-                            if (cursoChar == 's')
+                            inscripcionMod.nota = 0;
+                            inscripcionMod.fecha = "";
+                            if (cursoChar == 's' || cursoChar == 'S')
                             {
                                 char rindioChar = validarCharSON("El alumno rindió el final? s/n");
-                                if (rindioChar == 's')
+                                if (rindioChar == 's' || rindioChar == 'S')
                                 {
                                     double notaIngresada;
                                     do
@@ -924,10 +924,16 @@ namespace ProyectoProg1
                                     inscripcionMod.estado = "Cursado";
                                 }
                             }
-                            nuevaLista[i] = inscripcionMod;
-                           // EscribirInscripcionEnArchivo(inscripcionPath, false);
+                            listaInscripcion[i] = inscripcionMod;
+                            Console.Clear();
+                            Console.WriteLine("Alumno modificado con exito");
+                            EscribirInscripcionEnArchivo(listaInscripcion, false);
                         }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("No existe la materia con el indice ingresado");
                 }
 
             }
@@ -936,6 +942,8 @@ namespace ProyectoProg1
                 Console.WriteLine("No se encontro ningun alumno inscripto con ese indice");
             }
         }
+
+        // MENU INSCRIPCIONES
 
         static void MenuInscripciones()
         {
@@ -960,20 +968,20 @@ namespace ProyectoProg1
                 List<Inscripcion> listaInscripcion = TraerInscripcionDeArchivo(inscripcionPath);
                 List<Materia> listaMaterias = TraerMateriasDeArchivo(materiasPath);
                 string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
-                if (opcion == "1")
+                if (opcion == "1") // INSCRIBIR ALUMNO
                 {
                     InscribirAlumno(listaInscripcion, listaMaterias);
                 }
-                else if (opcion == "2")
+                else if (opcion == "2") // ESTADO INSCRIPCION DE UN ALUMNO
                 {
                     EstadoInscripcionAlumno();
 
                 }
-                else if (opcion == "3")
+                else if (opcion == "3") // MODIFICAR INSCRIPCION
                 {
                     ModificarInscripcion(listaInscripcion, linea);
                 }
-                else if (opcion == "4")
+                else if (opcion == "4") // MOSTRAR TODAS LAS INSCRIPCIONES
                 {
                     Console.WriteLine(linea);
                     string nombreMateria;
@@ -1044,13 +1052,3 @@ namespace ProyectoProg1
         }
     }
 }
-
-// Que tiene que hacer la seccion inscripcion?
-// tiene que hacer un crud o solo ingresar y leer
-// tengo que ingresar la fecha 1x1? o formato dd/mm/yyyy
-// nota al estar anotado me aparece en 0
-// si modifica, al modificarlo como se a cual materia apunta? doble check
-// linea 330 midificar alumno si ingresa otro dni ya existente...
-// linea 575 nombre de la materia ya existe
-// linea 876 recorrer materias inscriptas y filtrar
-// linea 928 al modificar use una lista nuevam tengo que modificar la anterior
