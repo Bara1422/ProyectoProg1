@@ -686,9 +686,10 @@ namespace ProyectoProg1
                     {
                         if (listaAlumnosExistente[i].estaActivo == true)
                         {
-                        existeAlumno = true;
-                        alumno = listaAlumnosExistente[i];
-                        }else
+                            existeAlumno = true;
+                            alumno = listaAlumnosExistente[i];
+                        }
+                        else
                         {
                             Console.WriteLine("El alumno está desactivado, por favor activelo o elija otro alumno");
                         }
@@ -715,7 +716,8 @@ namespace ProyectoProg1
                             {
                                 existeMateria = true;
                                 materia = listaMateriasExistente[i];
-                            }else
+                            }
+                            else
                             {
                                 Console.WriteLine("La materia está desactivada por favor activela o elija otra materia");
                             }
@@ -837,6 +839,31 @@ namespace ProyectoProg1
                 string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
                 Console.WriteLine(linea);
                 string nombreMateria;
+                int cantMateriasInscripto = 0;
+
+                //for (int i = 0; i < listaInscripcion.Count; i++)
+                //{
+                //    if (listaInscripcion[i].indice_alumno == indiceAlumno)
+                //    {
+                //        nombreMateria = "";
+                //        int j = 0;
+                //        bool encontre = false;
+                //        while (j < listaMaterias.Count && !encontre)
+                //        {
+                //            if (listaInscripcion[i].indice_materia == listaMaterias[j].indice)
+                //            {
+                //                encontre = true;
+                //                nombreMateria = listaMaterias[j].nombreMateria;
+                //            }
+                //            j++;
+                //        }
+                //        Inscripcion inscripcion = listaInscripcion[i];
+                //        string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
+                //        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
+                //        cantMateriasInscripto++;
+                //    }
+                //}
+                List<Inscripcion> inscripcionesAlumno = new List<Inscripcion>();
                 foreach (Inscripcion inscripcion in listaInscripcion)
                 {
                     if (inscripcion.indice_alumno == indiceAlumno)
@@ -855,9 +882,45 @@ namespace ProyectoProg1
                         }
                         string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
                         Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
+                        inscripcionesAlumno.Add(inscripcion);
                     }
                 }
                 Console.WriteLine();
+                char opcionBubble = validarCharSON("Desea ordenar las notas del alumno en forma decreciente? Elija una opción s/n");
+                if (opcionBubble == 's' || opcionBubble == 'S')
+                {
+                    Console.Clear();
+                    Console.WriteLine(linea);
+                    for (int i = inscripcionesAlumno.Count; i > 0; i--)
+                    {
+                        for (int j = inscripcionesAlumno.Count - 1; j > 0; j--)
+                        {
+                            if (inscripcionesAlumno[j].nota > inscripcionesAlumno[j - 1].nota)
+                            {
+                                Inscripcion inscripcionTemp = inscripcionesAlumno[j];
+                                inscripcionesAlumno[j] = inscripcionesAlumno[j - 1];
+                                inscripcionesAlumno[j - 1] = inscripcionTemp;
+                            }
+                        }
+                    }
+                }
+                foreach (Inscripcion inscripto in inscripcionesAlumno)
+                {
+                    nombreMateria = "";
+                    int i = 0;
+                    bool encontre = false;
+                    while (i < listaMaterias.Count && !encontre)
+                    {
+                        if (inscripto.indice_materia == listaMaterias[i].indice)
+                        {
+                            encontre = true;
+                            nombreMateria = listaMaterias[i].nombreMateria;
+                        }
+                        i++;
+                    }
+                    string notaCorregida = inscripto.nota == 0 ? "-" : inscripto.nota.ToString();
+                    Console.WriteLine($"{inscripto.indice.ToString().PadRight(10)}{inscripto.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripto.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripto.fecha}");
+                }
             }
             else
             {
