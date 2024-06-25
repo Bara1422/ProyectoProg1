@@ -839,30 +839,7 @@ namespace ProyectoProg1
                 string linea = "INDICE".PadRight(10) + "ALUMNO".PadRight(10) + "MATERIA".PadRight(20) + "ESTADO".PadRight(15) + "NOTA".PadRight(10) + "FECHA";
                 Console.WriteLine(linea);
                 string nombreMateria;
-                int cantMateriasInscripto = 0;
-
-                //for (int i = 0; i < listaInscripcion.Count; i++)
-                //{
-                //    if (listaInscripcion[i].indice_alumno == indiceAlumno)
-                //    {
-                //        nombreMateria = "";
-                //        int j = 0;
-                //        bool encontre = false;
-                //        while (j < listaMaterias.Count && !encontre)
-                //        {
-                //            if (listaInscripcion[i].indice_materia == listaMaterias[j].indice)
-                //            {
-                //                encontre = true;
-                //                nombreMateria = listaMaterias[j].nombreMateria;
-                //            }
-                //            j++;
-                //        }
-                //        Inscripcion inscripcion = listaInscripcion[i];
-                //        string notaCorregida = inscripcion.nota == 0 ? "-" : inscripcion.nota.ToString();
-                //        Console.WriteLine($"{inscripcion.indice.ToString().PadRight(10)}{inscripcion.indice_alumno.ToString().PadRight(10)}{nombreMateria.PadRight(20)}{inscripcion.estado.PadRight(15)}{notaCorregida.PadRight(10)}{inscripcion.fecha}");
-                //        cantMateriasInscripto++;
-                //    }
-                //}
+                
                 List<Inscripcion> inscripcionesAlumno = new List<Inscripcion>();
                 foreach (Inscripcion inscripcion in listaInscripcion)
                 {
